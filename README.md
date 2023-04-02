@@ -1,8 +1,15 @@
 # myFitnessPet
 
 
+### Requirements : 
 
-jinja2, flask
+jinja2, flask, sqlite3
+
+### To use : 
+
+run app.py
+
+open in web browser
 
 ### Functionalities
 
