@@ -1,104 +1,94 @@
-<!doctype html>
+<!DOCTYPE html>
 <html>
 <head>
-    <title>{{ pet_data[0] }} - Pet Page</title>
+    <title>{{ pet_name }} - Pet Nutrition and Weight Tracker</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@3.7.0/dist/chart.min.js"></script>
 </head>
 <body>
-    <h1>{{ pet_data[0] }}</h1>
-    <img src="{{ url_for('static', filename='data/dog.jpeg') }}" alt="{{ pet_data[0] }}">
-
-    <h2>Nutrition Logs</h2>
-    <table>
-        <thead>
-            <tr>
-                <th>Date</th>
-                <th>Nutrition</th>
-            </tr>
-        </thead>
-        <tbody>
-            {% for log in nutrition_logs %}
-            <tr>
-                <td>{{ log[1] }}</td>
-                <td>{{ log[2] }}</td>
-            </tr>
-            {% endfor %}
-        </tbody>
-    </table>
-
-    <form onsubmit="submitNutritionForm(event, '{{ pet_data[0] }}')">
-        <label for="nutrition">Nutrition:</label>
-        <input type="text" id="nutrition" name="nutrition"><br>
-        <label for="date">Date:</label>
-        <input type="text" id="date" name="date"><br>
-        <input type="submit" value="Submit">
-    </form>
-
-    <h2>Weight Logs</h2>
-    <table>
-        <thead>
-            <tr>
-                <th>Date</th>
-                <th>Weight</th>
-            </tr>
-        </thead>
-        <tbody>
-            {% for log in weight_logs %}
-            <tr>
-                <td>{{ log[1] }}</td>
-                <td>{{ log[2] }}</td>
-            </tr>
-            {% endfor %}
-        </tbody>
-    </table>
-
-
-
-    <form onsubmit="submitWeightForm(event, '{{ pet_data[0] }}')">
-        <label for="weight">Weight:</label>
-        <input type="text" id="weight" name="weight"><br>
-        <label for="date">Date:</label>
-        <input type="text" id="date" name="date"><br>
-        <input type="submit" value="Submit">
-    </form>
-
+    <div class="container">
+        <header>
+            <h1>{{ pet_name }}</h1>
+        </header>
+        <main>
+            <h2>Nutrition Logs <span class="expand-collapse">[+]</span></h2>
+            <table class="log-table nutrition-log">
+                <thead>
+                    <tr>
+                        <th>Date</th>
+                        <th>Nutrition</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for log in nutrition_logs %}
+                        <tr>
+                            <td>{{ log[1] }}</td>
+                            <td>{{ log[2] }}</td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+            <h2>Weight Logs <span class="expand-collapse">[+]</span></h2>
+            <table class="log-table weight-log">
+                <thead>
+                    <tr>
+                        <th>Date</th>
+                        <th>Weight</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for log in weight_logs %}
+                        <tr>
+                            <td>{{ log[1] }}</td>
+                            <td>{{ log[2] }}</td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+            <h2>Weight History</h2>
+            <canvas id="weight-chart" width="200" height="100"></canvas>
+        </main>
+    </div>
     <script>
-        function submitNutritionForm(event, petName) {
-            event.preventDefault();
-            var nutrition = document.getElementById("nutrition").value;
-            var date = document.getElementById("date").value;
-
-            var xhr = new XMLHttpRequest();
-            xhr.open("POST", "/api/pet/" + petName + "/nutrition", true);
-            xhr.setRequestHeader("Content-Type", "application/json;charset=UTF-8");
-            xhr.send(JSON.stringify({ nutrition: nutrition, date: date }));
-
-            xhr.onload = function () {
-                if (xhr.status == 200) {
-                    alert("Nutrition log added successfully for " + petName);
-                } else {
-                    alert("Error adding nutrition log for " + petName);
+        var weightData = {{ weight_data|safe }};
+        var weightDates = {{ weight_dates|safe }};
+        var ctx = document.getElementById('weight-chart').getContext('2d');
+        var chart = new Chart(ctx, {
+            type: 'line',
+            data: {
+                labels: weightDates,
+                datasets: [{
+                    label: 'Weight',
+                    data: weightData,
+                    fill: false,
+                    borderColor: 'rgb(75, 192, 192)',
+                    tension: 0.1
+                }]
+            },
+            options: {
+                scales: {
+                    y: {
+                        beginAtZero: true
+                    }
                 }
-            };
-        }
+            }
+        });
 
-        function submitWeightForm(event, petName) {
-            event.preventDefault();
-            var weight = document.getElementById("weight").value;
-            var date = document.getElementById("date").value;
-
-            var xhr = new XMLHttpRequest();
-            xhr.open("POST", "/api/pet/" + petName + "/weight", true);
-            xhr.setRequestHeader("Content-Type", "application/json;charset=UTF-8");
-            xhr.send(JSON.stringify({ weight: weight, date: date }));
-
-            xhr.onload = function () {
-                if (xhr.status == 200) {
-                    alert("Weight log added successfully for " + petName);
+        // Add click event listener to expand/collapse buttons
+        var expandCollapseButtons = document.querySelectorAll('.expand-collapse');
+        expandCollapseButtons.forEach(function(button) {
+            button.addEventListener('click', function() {
+                // Toggle log table display
+                var table = this.parentNode.nextElementSibling;
+                if (table.style.display === 'none') {
+                    table.style.display = 'block';
+                    this.innerText = '[-]';
                 } else {
-                    alert("Error adding weight log for " + petName);
-}
-};
-}
-</script>
+                    table.style.display = 'none';
+                    this.innerText = '[+]';
+                }
+            });
+        });
+    </script>
 </body>
 </html>

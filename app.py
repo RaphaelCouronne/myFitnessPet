@@ -2,6 +2,7 @@ import sqlite3
 from flask import Flask, jsonify, request
 from flask import url_for
 from flask import render_template
+from datetime import datetime
 
 app = Flask(__name__)
 DATABASE = 'pet_database.db'
@@ -95,31 +96,28 @@ def home():
     '''
 
 
+
 @app.route('/pet/<name>')
 def pet_page(name):
-    # Retrieve pet data from the database
     conn = sqlite3.connect(DATABASE)
     c = conn.cursor()
 
-    c.execute("SELECT * FROM pets WHERE name=?", (name,))
-    pet_data = c.fetchone()
-
-    # Check if the pet exists
-    if pet_data is None:
-        # Pet not found, return 404 error
-        return "Pet not found", 404
-
-    # Retrieve nutrition and weight logs from the database
+    # Retrieve nutrition and weight logs from database
     c.execute("SELECT * FROM nutrition_log WHERE pet_name=?", (name,))
     nutrition_logs = c.fetchall()
     c.execute("SELECT * FROM weight_log WHERE pet_name=?", (name,))
     weight_logs = c.fetchall()
 
+    # Format weight data for the chart
+    weight_data = [log[2] for log in weight_logs]
+    weight_dates = [log[1] for log in weight_logs]
+
     # Close database connection
     conn.close()
 
-    # Render the pet page template with the pet's data
-    return render_template('pet_page.html', pet_data=pet_data, nutrition_logs=nutrition_logs, weight_logs=weight_logs)
+    # Render the pet page template with the retrieved data
+    return render_template('pet_page.html', pet_name=name, nutrition_logs=nutrition_logs, weight_logs=weight_logs, weight_data=weight_data, weight_dates=weight_dates)
+
 
 
 @app.route('/api/pet', methods=['POST'])
