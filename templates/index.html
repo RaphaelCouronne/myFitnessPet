@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Pet Nutrition and Weight Tracker</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>Pet Nutrition and Weight Tracker</h1>
+        </header>
+        <main>
+            {% for pet in pets %}
+            <div class="card">
+                <a href="{{ url_for('pet_page', name=pet) }}" class="card-image-link">
+                    <img src="{{ url_for('static', filename='data/dog.jpeg') }}" class="card-image">
+                </a>
+                <h3 class="card-title">{{ pet }}</h3>
+                <form onsubmit="submitWeightForm(event, '{{ pet }}')" class="card-form">
+                    <label for="weight-{{ pet }}" class="card-form-label">Weight:</label>
+                    <input type="text" id="weight-{{ pet }}" name="weight" class="card-form-input">
+                    <label for="date-{{ pet }}" class="card-form-label">Date:</label>
+                    <input type="text" id="date-{{ pet }}" name="date" class="card-form-input">
+                    <button type="submit" class="card-form-button">Log Weight</button>
+                </form>
+                <form onsubmit="submitNutritionForm(event, '{{ pet }}')" class="card-form">
+                    <label for="nutrition-{{ pet }}" class="card-form-label">Nutrition:</label>
+                    <input type="text" id="nutrition-{{ pet }}" name="nutrition" class="card-form-input">
+                    <label for="date-{{ pet }}" class="card-form-label">Date:</label>
+                    <input type="text" id="date-{{ pet }}" name="date" class="card-form-input">
+                    <button type="submit" class="card-form-button">Log Nutrition</button>
+                </form>
+            </div>
+            {% endfor %}
+            <form action="{{ url_for('add_pet') }}" method="POST" class="new-pet-form">
+                <label for="pet-name" class="new-pet-form-label">Add New Pet:</label>
+                <input type="text" id="pet-name" name="pet_name" class="new-pet-form-input">
+                <button type="submit" class="new-pet-form-button">Add Pet</button>
+            </form>
+        </main>
+    </div>
+    <script src="{{ url_for('static', filename='scripts.js') }}"></script>
+</body>
+</html>

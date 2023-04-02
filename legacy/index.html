@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Pet Nutrition and Weight Tracker</title>
+  </head>
+  <body>
+    <h1>Pet Nutrition and Weight Tracker</h1>
+    <div id="pet-data"></div>
+    <h2>Log Nutrition</h2>
+    <form id="nutrition-form">
+      <label for="nutrition">Nutrition:</label>
+      <input type="text" id="nutrition" name="nutrition"><br>
+      <label for="date">Date:</label>
+      <input type="text" id="date" name="date"><br>
+      <input type="submit" value="Submit">
+    </form>
+    <h2>Log Weight</h2>
+    <form id="weight-form">
+      <label for="weight">Weight:</label>
+      <input type="text" id="weight" name="weight"><br>
+      <label for="date">Date:</label>
+      <input type="text" id="date" name="date"><br>
+      <input type="submit" value="Submit">
+    </form>
+    <script>
+      // Make API requests to log nutrition and weight
+      document.getElementById('nutrition-form').addEventListener('submit', function(event) {
+        event.preventDefault();
+        const nutrition = document.getElementById('nutrition').value;
+        const date = document.getElementById('date').value;
+        const payload = { nutrition, date };
+        const options = {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(payload)
+        };
+        fetch(`/api/pet/${petName}/nutrition`, options)
+          .then(response => response.json())
+          .then(data => alert(data.message))
+          .catch(error => console.error(error));
+      });
+
+      document.getElementById('weight-form').addEventListener('submit', function(event) {
+        event.preventDefault();
+        const weight = document.getElementById('weight').value;
+        const date = document.getElementById('date').value;
+        const payload = { weight, date };
+        const options = {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(payload)
+        };
+        fetch(`/api/pet/${petName}/weight`, options)
+          .then(response => response.json())
+          .then(data => alert(data.message))
+          .catch(error => console.error(error));
+      });
+
+      // Load pet data on page load
+      const petName = 'Fluffy'; // Replace with actual pet name
+      fetch(`/api/pet/${petName}`)
+        .then(response => response.json())
+        .then(data => {
+          const petDataElement = document.getElementById('pet-data');
+          petDataElement.innerHTML = `
+            <h2>${petName}</h2>
+            <p>Species: ${data.pet_data[1]}</p>
+            <p>Age: ${data.pet_data[2]}</p>
+            <p>Weight: ${data.pet_data[3]}</p>
+            <h3>Nutrition Log</h3>
+            <ul>
+              ${data.nutrition_logs.map(log => `<li>${log[1]}: ${log[2]}</li>`).join('')}
+            </ul>
+            <h3>Weight Log</h3>
+            <ul>
+              ${data.weight_logs.map(log => `<li>${log[1]}: ${log[2]}</li>`).join('')}
+            </ul>
+          `;
+        })
+        .catch(error => console.error(error));
+    </script>
+  </body>
+</
