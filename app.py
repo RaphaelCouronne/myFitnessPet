@@ -112,11 +112,17 @@ def pet_page(name):
     weight_data = [log[2] for log in weight_logs]
     weight_dates = [log[1] for log in weight_logs]
 
+    # Extract nutrition data and corresponding dates
+    nutrition_data = [log[2] for log in nutrition_logs]
+    nutrition_dates = [log[1] for log in nutrition_logs]
+
     # Close database connection
     conn.close()
 
     # Render the pet page template with the retrieved data
-    return render_template('pet_page.html', pet_name=name, nutrition_logs=nutrition_logs, weight_logs=weight_logs, weight_data=weight_data, weight_dates=weight_dates)
+    return render_template('pet_page.html', pet_name=name, nutrition_logs=nutrition_logs, weight_logs=weight_logs,
+                           weight_data=weight_data, weight_dates=weight_dates,
+                           nutrition_data=nutrition_data, nutrition_dates=nutrition_dates)
 
 
 

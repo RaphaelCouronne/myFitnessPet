@@ -9,8 +9,19 @@
     <div class="container">
         <header>
             <h1>{{ pet_name }}</h1>
+
         </header>
         <main>
+
+            {% if nutrition_logs %}
+                <h2>Nutrition Logs Chart</h2>
+                <canvas id="nutrition-chart" width="200" height="100"></canvas>
+            {% endif %}
+
+
+            <h2>Weight History</h2>
+            <canvas id="weight-chart" width="200" height="100"></canvas>
+
             <h2>Nutrition Logs <span class="expand-collapse">[+]</span></h2>
             <table class="log-table nutrition-log">
                 <thead>
@@ -45,8 +56,6 @@
                     {% endfor %}
                 </tbody>
             </table>
-            <h2>Weight History</h2>
-            <canvas id="weight-chart" width="200" height="100"></canvas>
         </main>
     </div>
     <script>
@@ -90,5 +99,35 @@
             });
         });
     </script>
+
+
+    {% if nutrition_logs %}
+    <script>
+        var nutritionData = {{ nutrition_data|safe }};
+        var nutritionDates = {{ nutrition_dates|safe }};
+        var ctx = document.getElementById('nutrition-chart').getContext('2d');
+        var chart = new Chart(ctx, {
+            type: 'line',
+            data: {
+                labels: nutritionDates,
+                datasets: [{
+                    label: 'Nutrition',
+                    data: nutritionData,
+                    fill: false,
+                    borderColor: 'rgb(255, 99, 132)',
+                    tension: 0.1
+                }]
+            },
+            options: {
+                scales: {
+                    y: {
+                        beginAtZero: true
+                    }
+                }
+            }
+        });
+    </script>
+    {% endif %}
+
 </body>
 </html>

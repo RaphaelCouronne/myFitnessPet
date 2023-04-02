@@ -1,5 +1,9 @@
 # myFitnessPet
 
+### Todo
+- add img cat or dog
+- add img in pet page
+- add current stats (bmr, activity level, weight, ...)
 
 ### Requirements : 
 

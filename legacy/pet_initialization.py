@@ -8,11 +8,11 @@ class Pet:
         self.weight = weight
         self.nutrition_log = []
         self.weight_log = []
-        self.conn = sqlite3.connect('../pet_database.db')
+        self.conn = sqlite3.connect('pet_database.db')
         self.c = self.conn.cursor()
 
         self.c.execute('''CREATE TABLE IF NOT EXISTS nutrition_log
-                     (pet_name text, date text, nutrition_info text)''')
+                     (pet_name text, date text, nutrition_info text, kcal integer)''')
 
         # Create weight log table
         self.c.execute('''CREATE TABLE IF NOT EXISTS weight_log
@@ -21,6 +21,8 @@ class Pet:
         # Create name table
         self.c.execute('''CREATE TABLE IF NOT EXISTS pets
                      (name text)''')
+
+        self.log_pet()
 
 
 
@@ -31,9 +33,23 @@ class Pet:
         self.nutrition_log.append(nutrition_info)
         date = nutrition_info['date']
         nutrition = nutrition_info['nutrition']
-        self.c.execute("INSERT INTO nutrition_log VALUES (?, ?, ?)",
-                       (self.name, date, nutrition))
+        kcal = nutrition_info['kcal']
+        self.c.execute("INSERT INTO nutrition_log VALUES (?, ?, ?, ?)",
+                       (self.name, date, kcal, nutrition))
         self.conn.commit()
+
+    def log_pet(self):
+
+        pet_name = self.name
+
+        # Check if the pet already exists
+        self.c.execute("SELECT * FROM pets WHERE name=?", (pet_name,))
+        existing_pet = self.c.fetchone()
+
+        if existing_pet is None:
+            # Add the pet to the database
+            self.c.execute("INSERT INTO pets (name) VALUES (?)", (pet_name,))
+            self.conn.commit()
 
     def log_weight(self, weight_info):
         self.weight_log.append(weight_info)
@@ -102,14 +118,19 @@ class Meal:
 
 pet1 = Pet('Max', 'dog', 5, 20)
 pet1.log_weight({"weight": 10, "date": "2023-12-04"})
-pet1.log_nutrition({"nutrition": "croquetas", "date": "2023-12-04"})
+pet1.log_nutrition({"nutrition": "croquetas", "kcal": 10, "date": "2022-01-04"})
+pet1.log_nutrition({"nutrition": "croquetas", "kcal": 12, "date": "2022-05-04"})
+pet1.log_nutrition({"nutrition": "croquetas", "kcal": 14, "date": "2022-07-04"})
+pet1.log_nutrition({"nutrition": "croquetas", "kcal": 8, "date": "2023-12-04"})
 
 
 pet2 = Pet('George', 'cat', 4, 10)
 pet2.log_weight({"weight": 5, "date": "2023-12-04"})
-pet2.log_nutrition({"nutrition": "patée", "date": "2023-12-04"})
+pet2.log_nutrition({"nutrition": "patée", "kcal": 15, "date": "2023-12-04"})
+pet2.log_nutrition({"nutrition": "patée", "kcal": 10, "date": "2023-12-05"})
+pet2.log_nutrition({"nutrition": "patée", "kcal": 14, "date": "2023-12-06"})
 
-
+#todo add automatically the pet here
 
 """
 while True:
